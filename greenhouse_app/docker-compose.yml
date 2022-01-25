@@ -1,0 +1,21 @@
+﻿version: "3.7"
+
+services:
+
+    mongo:
+        image: mongo
+        restart: always
+        ports:
+            - 27017:27017
+        volumes:
+            - ~/docker/mongo:/data/db
+
+    greenhouse_app:
+        build: .
+        privileged: true
+        devices:
+            - '/dev/:/dev/'
+        restart: always
+        tty: true
+
+    
