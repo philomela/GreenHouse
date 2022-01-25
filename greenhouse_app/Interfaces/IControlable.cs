@@ -7,6 +7,10 @@ namespace greenhouse_app.Interfaces
 
         void TurnOffLamps();
 
+        void TurnOnTemperature();
+
+        void TurnOffTemperature();
+
         void TurnOnFans();
 
         void TurnOffFans();
