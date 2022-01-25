@@ -19,6 +19,11 @@ namespace greenhouse_app.Implementations
             throw new NotImplementedException();
         }
 
+        public void TurnOffTemperature()
+        {
+            throw new NotImplementedException();
+        }
+
         public void TurnOffWatering()
         {
             throw new NotImplementedException();
@@ -30,6 +35,11 @@ namespace greenhouse_app.Implementations
         }
 
         public void TurnOnLamps()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void TurnOnTemperature()
         {
             throw new NotImplementedException();
         }
