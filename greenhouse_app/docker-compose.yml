@@ -3,7 +3,7 @@
 services:
 
     mongo:
-        image: mongo
+        image: arm7/mongo
         restart: always
         ports:
             - 27017:27017
