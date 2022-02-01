@@ -3,7 +3,7 @@
 services:
 
     mongo:
-        image: mongo
+        image: arm7/mongo
         restart: always
         ports:
             - 27017:27017
@@ -16,6 +16,7 @@ services:
         devices:
             - '/dev/:/dev/'
         restart: always
+        command: tail -f /dev/null
         tty: true
 
     
