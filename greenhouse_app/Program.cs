@@ -26,19 +26,20 @@ serviceCollection.AddTransient<MongoLoadedProgramRepository>(x => new MongoLoade
 serviceCollection.AddTransient<Dispatcher>();
 var serviceProvider = serviceCollection.BuildServiceProvider();
 
-var portDetect = await Configure(serviceProvider.GetService<Dispatcher>());
+Console.WriteLine("Control application started");
 
-Console.WriteLine($"{portDetect}");
+var dispatcher = serviceProvider.GetService<Dispatcher>();
+
+var portDetected = await Configure();
+
+Console.WriteLine($"{portDetected}");
+
+dispatcher.ShowProgramMongoAsync();
 
 Console.ReadLine();
 
-static async Task<string> Configure(Dispatcher dispatcher)
+static async Task<string> Configure()
 {
-    Console.WriteLine("Control application started");
-
-    dispatcher.ShowProgramMongoAsync();
-
-
     var serialPorts = SerialPort.GetPortNames();
 
     var taskSlice = new List<Task<string>>();
@@ -57,7 +58,7 @@ static async Task<string> Configure(Dispatcher dispatcher)
                 }));
     }
 
-    string portDetect = await Task.Run(() =>
+    string portDetected = await Task.Run(() =>
     {
         string portDetected = null;
         while (true)
@@ -74,7 +75,7 @@ static async Task<string> Configure(Dispatcher dispatcher)
     });
 
     cts.Cancel();
-    return portDetect;
+    return portDetected;
 }
 
 static async Task<string> PingPort(SerialPort serialPort, CancellationToken token, int baudRate = 9600)
