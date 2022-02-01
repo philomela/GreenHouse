@@ -8,7 +8,7 @@ RUN dotnet publish -c release -o /app -r linux-arm --self-contained false --no-r
 
 FROM mcr.microsoft.com/dotnet/runtime:6.0-bullseye-slim-arm32v7
 WORKDIR /app
-COPY --from=build /app/ .
+COPY --from=build /app ./
 ENTRYPOINT ["dotnet", "greenhouse_app.dll"]
 
 
