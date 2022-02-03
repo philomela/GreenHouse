@@ -27,12 +27,15 @@ serviceCollection.AddTransient<Dispatcher>();
 var serviceProvider = serviceCollection.BuildServiceProvider();
 
 Console.WriteLine("Control application started");
+Console.WriteLine(new InDbTransmitterProgram(new FromFileTransmitterProgram<string, string>()).LoadProgram(""));
 
 var dispatcher = serviceProvider.GetService<Dispatcher>();
 
 var portDetected = await Configure();
 
-Console.WriteLine($"{portDetected}");
+
+
+
 
 dispatcher.ShowProgramMongoAsync();
 
@@ -60,7 +63,7 @@ static async Task<string> Configure()
 
     string portDetected = await Task.Run(() =>
     {
-        string portDetected = null;
+        string portDetected = String.Empty;
         while (true)
         {
             portDetected = taskSlice.Where(
@@ -69,7 +72,7 @@ static async Task<string> Configure()
 
             if (!string.IsNullOrEmpty(portDetected))
             {
-               return portDetected;
+                return portDetected;
             }
         }
     });
@@ -81,7 +84,6 @@ static async Task<string> Configure()
 static async Task<string> PingPort(SerialPort serialPort, CancellationToken token, int baudRate = 9600)
 {
     var msgPing = string.Empty;
-    //var serialPort = new SerialPort(namePort);
 
     serialPort.BaudRate = baudRate;
     serialPort.Open();
@@ -89,8 +91,8 @@ static async Task<string> PingPort(SerialPort serialPort, CancellationToken toke
     while (msgPing != "PingMsg\r")
     {
         if (token.IsCancellationRequested)
-            return null;
-        msgPing = serialPort.ReadLine();     
+            return String.Empty;
+        msgPing = serialPort.ReadLine();
     }
 
     Console.WriteLine($"Port arduino detected: {serialPort.PortName}");
