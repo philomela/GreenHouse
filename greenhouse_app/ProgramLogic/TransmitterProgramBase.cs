@@ -8,9 +8,7 @@ namespace greenhouse_app.ProgramLogic
 	{
 		private readonly IRepository<LoadedProgram> _repository;
 
-		public Func<T, TResult> baseAction { get;  set; }
-
-		public abstract TResult LoadProgram(T path);
+		public abstract Task<TResult> TransmitProgram(T path);
 	}
 }
  

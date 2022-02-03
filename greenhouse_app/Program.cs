@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using System.Linq;
 using greenhouse_app.Extensions;
+using greenhouse_app.Data.Models;
 
 var builder = new ConfigurationBuilder();
 
@@ -27,7 +28,7 @@ serviceCollection.AddTransient<Dispatcher>();
 var serviceProvider = serviceCollection.BuildServiceProvider();
 
 Console.WriteLine("Control application started");
-Console.WriteLine(new InDbTransmitterProgram(new FromFileTransmitterProgram<string, string>()).LoadProgram(""));
+var res = await new InDbTransmitterProgram<string, LoadedProgram>(new FromFileTransmitterProgram<string, LoadedProgram>()).TransmitProgram("ProgramExample.json");
 
 var dispatcher = serviceProvider.GetService<Dispatcher>();
 

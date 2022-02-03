@@ -1,17 +1,24 @@
 ﻿using System;
+using greenhouse_app.Data.Models;
+using Newtonsoft.Json;
+
 namespace greenhouse_app.ProgramLogic
 {
-	public class InDbTransmitterProgram : TransmitterProgramDecorator<string, string>
+	public class InDbTransmitterProgram<T, TResult> : TransmitterProgramDecorator<T, TResult>
 	{
-		public InDbTransmitterProgram(TransmitterProgramBase<string, string> trans)
+		public InDbTransmitterProgram(TransmitterProgramBase<T, TResult> trans)
             : base(trans)
 		{
 		}
         
-        public override string LoadProgram(string path)
+        public override async Task<TResult> TransmitProgram(T path)
         {
-            return transmitter.LoadProgram(path) + "Functional load from db";
-            
+            var programDecorate = await transmitter.TransmitProgram(path) as LoadedProgram;
+
+            programDecorate.Days += 30;
+            programDecorate.CollectionProgram.Add(new LoadedProgram() { Temperature = 100});
+
+            return (TResult)(object)programDecorate;           
         }
     }
 }
