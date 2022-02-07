@@ -23,19 +23,19 @@ string connectionString = config.GetConnectionString("Mongo");
 var serviceCollection = new ServiceCollection();
 serviceCollection.AddTransient<IAuditorable, AuditorGreenHouse>();
 serviceCollection.AddTransient<IControlable, ControllerGreenHouse>();
+serviceCollection.AddTransient<IParserProgramStages, ParserProgramStages>();
+serviceCollection.AddTransient<TransmitterProgramBase<string, LoadedProgramBase>, FromFileTransmitterProgram<string, LoadedProgramBase>>();
 serviceCollection.AddTransient<MongoLoadedProgramRepository>(x => new MongoLoadedProgramRepository(connectionString));
 serviceCollection.AddTransient<Dispatcher>();
 var serviceProvider = serviceCollection.BuildServiceProvider();
 
 Console.WriteLine("Control application started");
-var res = await new InDbTransmitterProgram<string, LoadedProgram>(new FromFileTransmitterProgram<string, LoadedProgram>()).TransmitProgram("ProgramExample.json");
+
+var programFromFile = await new InDbTransmitterProgram<string, LoadedProgramBase>(new FromFileTransmitterProgram<string, LoadedProgramBase>(serviceProvider.GetService<IParserProgramStages>())).TransmitProgram("ProgramExample.json");
 
 var dispatcher = serviceProvider.GetService<Dispatcher>();
 
 var portDetected = await Configure();
-
-
-
 
 
 dispatcher.ShowProgramMongoAsync();

@@ -1,13 +1,16 @@
 ﻿using System;
 using greenhouse_app.Data.Models;
+using greenhouse_app.Interfaces;
 using Newtonsoft.Json;
 
 namespace greenhouse_app.ProgramLogic
 {
 	public class FromFileTransmitterProgram<T, TResult> : TransmitterProgramBase<T, TResult>
 	{
-		public FromFileTransmitterProgram()  : base()
+        private readonly IParserProgramStages _parserStages;
+        public FromFileTransmitterProgram(IParserProgramStages parserStages)  : base()
 		{
+            _parserStages = parserStages;
         }
 
         public override async Task<TResult> TransmitProgram(T path)
@@ -17,8 +20,8 @@ namespace greenhouse_app.ProgramLogic
             using (var readerFile = new StreamReader(pathToFile))
             {
                 var textProgram = await readerFile.ReadToEndAsync();
-                var programFromFile = JsonConvert.DeserializeObject<LoadedProgram>(textProgram);
-
+                var programFromFile = JsonConvert.DeserializeObject<LoadedProgramBase>(textProgram);
+                programFromFile.Stages = _parserStages.ParseProgramStages(programFromFile.Stages);
                 return (TResult)(object)programFromFile;
             }
         }

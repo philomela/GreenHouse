@@ -1,26 +1,28 @@
 ﻿{
-	"Program": {
-		"CountStage": 3,
-		"Stage_one": {
-			"Name": "Vegetables",
-			"Days": 30,
-			"Light": 24,
-			"Water": "70%",
-			"Temperature": "20-24"
-		},
-		"Stage_two": {
-			"Name": "Flowering",
-			"Days": 60,
-			"Light": 12,
-			"Water": "60%",
-			"Temperature": "24-30"
-		},
-		"Stage_three": {
-			"Name": "Harvest",
-			"Days": 5,
-			"Light": 0,
-			"Water": "0%",
-			"Temperature": 18
-		}
-	}
+  "Stages": [
+    {
+      "Name": "Vegetables",
+      "Days": 30,
+      "LightHours": 24,
+      "WaterPercent": 70,
+      "MinTemperature": 20,
+      "MaxTemperature": 24
+    },
+    {
+      "Name": "Flowering",
+      "Days": 60,
+      "Light": 12,
+      "Water": 60,
+      "MinTemperature": 24,
+      "MaxTemperature": 30
+    },
+    {
+      "Name": "Harvest",
+      "Days": 5,
+      "Light": 0,
+      "Water": 0,
+      "MinTemperature": 18,
+      "MaxTemperature": 18
+    }
+  ]
 }

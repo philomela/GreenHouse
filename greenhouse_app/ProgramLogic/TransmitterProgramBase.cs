@@ -6,7 +6,7 @@ namespace greenhouse_app.ProgramLogic
 {
 	public abstract class TransmitterProgramBase<T, TResult>
 	{
-		private readonly IRepository<LoadedProgram> _repository;
+		private readonly IRepository<LoadedProgramBase> _repository;
 
 		public abstract Task<TResult> TransmitProgram(T path);
 	}

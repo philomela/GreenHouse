@@ -7,7 +7,7 @@ using System.Configuration;
 
 namespace greenhouse_app.Implementations
 {
-    public class MongoLoadedProgramRepository : IRepository<LoadedProgram>
+    public class MongoLoadedProgramRepository : IRepository<LoadedProgramBase>
     {
         private readonly MongoClient client;
         private readonly IMongoDatabase database;
@@ -23,11 +23,11 @@ namespace greenhouse_app.Implementations
             collection = database.GetCollection<BsonDocument>("LoadedProgram");
         }
 
-        public IMongoCollection<LoadedProgram> LoadedPrograms
+        public IMongoCollection<LoadedProgramBase> LoadedPrograms
         {
             get
             {
-                return database.GetCollection<LoadedProgram>("LoadedProgram");
+                return database.GetCollection<LoadedProgramBase>("LoadedProgram");
             }
         }
 
@@ -43,22 +43,22 @@ namespace greenhouse_app.Implementations
 
         public void Dispose() { }
 
-        public IEnumerable<LoadedProgram> GetLoadedProgramList()
+        public IEnumerable<LoadedProgramBase> GetLoadedProgramList()
         {
             throw new NotImplementedException();
         }
 
-        public LoadedProgram GetLoadedProgram(int id)
+        public LoadedProgramBase GetLoadedProgram(int id)
         {
             throw new NotImplementedException();
         }
 
-        public void Create(LoadedProgram item)
+        public void Create(LoadedProgramBase item)
         {
             throw new NotImplementedException();
         }
 
-        public void Update(LoadedProgram item)
+        public void Update(LoadedProgramBase item)
         {
             throw new NotImplementedException();
         }
