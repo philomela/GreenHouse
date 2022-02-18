@@ -27,14 +27,15 @@
     <None Remove="Extensions\" />
     <None Remove="Newtonsoft.Json" />
     <None Remove="System.IO" />
+    <None Remove="Data\DTOs\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.IO.Ports" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
     <PackageReference Include="MongoDB.Bson" Version="2.14.1" />
     <PackageReference Include="MongoDB.Driver" Version="2.14.1" />
     <PackageReference Include="MongoDB.Driver.Core" Version="2.14.1" />
+    <PackageReference Include="System.IO.Ports" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="System.IO" Version="4.3.0" />
   </ItemGroup>
@@ -45,6 +46,7 @@
     <Folder Include="Data\" />
     <Folder Include="Data\Models\" />
     <Folder Include="Extensions\" />
+    <Folder Include="Data\DTOs\" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.json">

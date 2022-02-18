@@ -11,7 +11,7 @@ namespace greenhouse_app.Implementations
     {
         private readonly MongoClient client;
         private readonly IMongoDatabase database;
-        private readonly IMongoCollection<BsonDocument> collection;
+        private readonly IMongoCollection<LoadedProgramBase> collection;
         private readonly string _connectionString;
 
         public MongoLoadedProgramRepository(string connectionString)
@@ -20,18 +20,10 @@ namespace greenhouse_app.Implementations
 
             client = new MongoClient(connectionString);
             database = client.GetDatabase(connection.DatabaseName);
-            collection = database.GetCollection<BsonDocument>("LoadedProgram");
+            collection = database.GetCollection<LoadedProgramBase>("LoadedProgram");
         }
 
-        public IMongoCollection<LoadedProgramBase> LoadedPrograms
-        {
-            get
-            {
-                return database.GetCollection<LoadedProgramBase>("LoadedProgram");
-            }
-        }
-
-        public async Task<List<BsonDocument>> GetLoadedProgramListAsync()
+        public async Task<List<LoadedProgramBase>> GetLoadedProgramListAsync()
         {
             
             var filter = new BsonDocument();
@@ -55,7 +47,7 @@ namespace greenhouse_app.Implementations
 
         public void Create(LoadedProgramBase item)
         {
-            throw new NotImplementedException();
+            collection.InsertOneAsync(item);
         }
 
         public void Update(LoadedProgramBase item)

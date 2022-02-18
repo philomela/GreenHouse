@@ -1,4 +1,5 @@
 ﻿{
+  "NameProgram": "TestProgram",
   "Stages": [
     {
       "Name": "Vegetables",
@@ -11,16 +12,16 @@
     {
       "Name": "Flowering",
       "Days": 60,
-      "Light": 12,
-      "Water": 60,
+      "LightHours": 12,
+      "WaterPercent": 60,
       "MinTemperature": 24,
       "MaxTemperature": 30
     },
     {
       "Name": "Harvest",
       "Days": 5,
-      "Light": 0,
-      "Water": 0,
+      "LightHours": 0,
+      "WaterPercent": 0,
       "MinTemperature": 18,
       "MaxTemperature": 18
     }

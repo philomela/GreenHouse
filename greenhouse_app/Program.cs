@@ -24,21 +24,34 @@ var serviceCollection = new ServiceCollection();
 serviceCollection.AddTransient<IAuditorable, AuditorGreenHouse>();
 serviceCollection.AddTransient<IControlable, ControllerGreenHouse>();
 serviceCollection.AddTransient<IParserProgramStages, ParserProgramStages>();
-serviceCollection.AddTransient<TransmitterProgramBase<string, LoadedProgramBase>, FromFileTransmitterProgram<string, LoadedProgramBase>>();
-serviceCollection.AddTransient<MongoLoadedProgramRepository>(x => new MongoLoadedProgramRepository(connectionString));
+serviceCollection.AddTransient<IRepository<LoadedProgramBase>, MongoLoadedProgramRepository>(x => new MongoLoadedProgramRepository(connectionString));
 serviceCollection.AddTransient<Dispatcher>();
 var serviceProvider = serviceCollection.BuildServiceProvider();
 
 Console.WriteLine("Control application started");
 
-var programFromFile = await new InDbTransmitterProgram<string, LoadedProgramBase>(new FromFileTransmitterProgram<string, LoadedProgramBase>(serviceProvider.GetService<IParserProgramStages>())).TransmitProgram("ProgramExample.json");
+var programFromFile = await new InDbTransmitterProgram<string, LoadedProgramBase>(
+    new FromFileTransmitterProgram<string, LoadedProgramBase>(serviceProvider.GetService<IParserProgramStages>()),
+    serviceProvider.GetService<IRepository<LoadedProgramBase>>()).TransmitProgram("ProgramExample.json");
 
-var dispatcher = serviceProvider.GetService<Dispatcher>();
+var mediator = new CommunicatorDevices();
+var arduino = new ArduinoChannel(mediator);
+var raspberry = new RaspberryChannel(mediator);
+mediator._arduinoChannel = arduino;
+mediator._raspberryChannel = raspberry;
+
+arduino.SendCommand("Hello I'am arduino uno!");
+
+raspberry.SendCommand("Hello I'm raspberry!");
+
+
+
+//var dispatcher = serviceProvider.GetService<Dispatcher>();
 
 var portDetected = await Configure();
 
 
-dispatcher.ShowProgramMongoAsync();
+//dispatcher.ShowProgramMongoAsync();
 
 Console.ReadLine();
 
