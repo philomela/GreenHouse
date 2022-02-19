@@ -6,7 +6,10 @@ using greenhouse_app.Interfaces;
 
 namespace greenhouse_app.ProgramLogic
 {
-    public class Dispatcher
+    /// <summary>
+    /// Реализовать логику работы с каналом распберри
+    /// </summary>
+    public class Dispatcher  
     {
         private readonly IAuditorable _auditor;
         private readonly IControlable _controller;

@@ -9,7 +9,7 @@ namespace greenhouse_app.Implementations
         public ArduinoChannel _arduinoChannel { get; set; }
         public RaspberryChannel _raspberryChannel { get; set; }
 
-        public void Notify(object sender, string message)
+        public async Task Notify(object sender, string message)
         {
             if (sender == _arduinoChannel)
             {
