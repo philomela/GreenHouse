@@ -6,8 +6,11 @@ namespace greenhouse_app.Implementations
 {
     public class CommunicatorDevices : ICommunicator
     {
-        public ArduinoChannel _arduinoChannel { get; set; }
-        public RaspberryChannel _raspberryChannel { get; set; }
+        private readonly ArduinoChannel _arduinoChannel;
+        private readonly RaspberryChannel _raspberryChannel;
+
+        public CommunicatorDevices(ArduinoChannel arduinoChannel, RaspberryChannel raspberryChannel) =>
+            (_arduinoChannel, _raspberryChannel) = (arduinoChannel, raspberryChannel);
 
         public async Task Notify(object sender, string message)
         {

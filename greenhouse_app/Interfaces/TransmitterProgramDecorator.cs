@@ -1,4 +1,6 @@
 ﻿using System;
+using greenhouse_app.ProgramLogic;
+
 namespace greenhouse_app.Interfaces
 {
 	public abstract class TransmitterProgramDecorator<T, TResult> : TransmitterProgramBase<T, TResult>

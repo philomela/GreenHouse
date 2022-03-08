@@ -31,7 +31,9 @@ void loop() {
   delay(5000);
 }
 
-void 
+void GetProgramOnDay() {
+  
+}
 
 void СonnectComputer() {
   volatile int msgIndicator = -1;
@@ -39,4 +41,14 @@ void СonnectComputer() {
     Serial.println("PingMsg");
     msgIndicator = Serial.read();
   }
+}
+
+void CorrectTemperature() {
+}
+
+void CorrectLigth() {
+}
+
+void CorrectWater() {
+}
 }

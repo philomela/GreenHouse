@@ -21,10 +21,11 @@ var config = builder.Build();
 string connectionString = config.GetConnectionString("Mongo");
 
 var serviceCollection = new ServiceCollection();
-serviceCollection.AddTransient<IAuditorable, AuditorGreenHouse>();
-serviceCollection.AddTransient<IControlable, ControllerGreenHouse>();
 serviceCollection.AddTransient<IParserProgramStages, ParserProgramStages>();
 serviceCollection.AddTransient<IRepository<LoadedProgramBase>, MongoLoadedProgramRepository>(x => new MongoLoadedProgramRepository(connectionString));
+serviceCollection.AddSingleton<ArduinoChannel>();
+serviceCollection.AddSingleton<RaspberryChannel>();
+serviceCollection.AddSingleton<ICommunicator, CommunicatorDevices>();
 serviceCollection.AddTransient<Dispatcher>();
 var serviceProvider = serviceCollection.BuildServiceProvider();
 
@@ -34,32 +35,37 @@ var programFromFile = await new InDbTransmitterProgram<string, LoadedProgramBase
     new FromFileTransmitterProgram<string, LoadedProgramBase>(serviceProvider.GetService<IParserProgramStages>()),
     serviceProvider.GetService<IRepository<LoadedProgramBase>>()).TransmitProgram("ProgramExample.json");
 
-var mediator = new CommunicatorDevices();
-var arduino = new ArduinoChannel(mediator);
-var raspberry = new RaspberryChannel(mediator);
-mediator._arduinoChannel = arduino;
-mediator._raspberryChannel = raspberry;
+//var mediator = new CommunicatorDevices();
+//var arduino = new ArduinoChannel(mediator);
+//var raspberry = new RaspberryChannel(mediator);
+//mediator._arduinoChannel = arduino;
+//mediator._raspberryChannel = raspberry;
 
-arduino.SendCommand("Hello I'am arduino uno!");
+//arduino.SendCommand("Hello I'am arduino uno!");
 
-raspberry.SendCommand("Hello I'm raspberry!");
-
+//raspberry.SendCommand("Hello I'm raspberry!");
 
 
 //var dispatcher = serviceProvider.GetService<Dispatcher>();
 
 var portDetected = await Configure();
 
+//portDetected.ListenArduinoAsync(arduino);
+
+var dispatcher = new Dispatcher(); //todo: Убрать констр по умолчанию и зарегистрировать красиво эту зависимоть
+
+
+
 
 //dispatcher.ShowProgramMongoAsync();
 
 Console.ReadLine();
 
-static async Task<string> Configure()
+static async Task<SerialPort> Configure()
 {
     var serialPorts = SerialPort.GetPortNames();
 
-    var taskSlice = new List<Task<string>>();
+    var taskSlice = new List<Task<SerialPort>>();
 
     var cts = new CancellationTokenSource();
     var token = cts.Token;
@@ -75,16 +81,16 @@ static async Task<string> Configure()
                 }));
     }
 
-    string portDetected = await Task.Run(() =>
+    var portDetected = await Task.Run(() =>
     {
-        string portDetected = String.Empty;
+        SerialPort portDetected = null;
         while (true)
         {
             portDetected = taskSlice.Where(
                 x => x is not null
                 && x.IsCompletedSuccessfully == true)?.FirstOrDefault()?.Result;
 
-            if (!string.IsNullOrEmpty(portDetected))
+            if (portDetected is not null)
             {
                 return portDetected;
             }
@@ -95,7 +101,7 @@ static async Task<string> Configure()
     return portDetected;
 }
 
-static async Task<string> PingPort(SerialPort serialPort, CancellationToken token, int baudRate = 9600)
+static async Task<SerialPort> PingPort(SerialPort serialPort, CancellationToken token, int baudRate = 9600)
 {
     var msgPing = string.Empty;
 
@@ -105,7 +111,7 @@ static async Task<string> PingPort(SerialPort serialPort, CancellationToken toke
     while (msgPing != "PingMsg\r")
     {
         if (token.IsCancellationRequested)
-            return String.Empty;
+            return serialPort;
         msgPing = serialPort.ReadLine();
     }
 
@@ -114,5 +120,5 @@ static async Task<string> PingPort(SerialPort serialPort, CancellationToken toke
     serialPort.Write(new byte[] { 1 }, 0, 1);
     Console.WriteLine("Arduino ready");
 
-    return serialPort.PortName;
+    return serialPort;
 }

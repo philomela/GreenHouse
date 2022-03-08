@@ -24,8 +24,7 @@ namespace greenhouse_app.Implementations
         }
 
         public async Task<List<LoadedProgramBase>> GetLoadedProgramListAsync()
-        {
-            
+        {          
             var filter = new BsonDocument();
             var loadedPrograms = await collection.Find(filter).ToListAsync();
             return loadedPrograms;
@@ -34,11 +33,6 @@ namespace greenhouse_app.Implementations
         public void Save() { }
 
         public void Dispose() { }
-
-        public IEnumerable<LoadedProgramBase> GetLoadedProgramList()
-        {
-            throw new NotImplementedException();
-        }
 
         public LoadedProgramBase GetLoadedProgram(int id)
         {

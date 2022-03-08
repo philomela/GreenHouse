@@ -8,6 +8,7 @@ namespace greenhouse_app.ProgramLogic
 	public class FromFileTransmitterProgram<T, TResult> : TransmitterProgramBase<T, TResult>
 	{
         private readonly IParserProgramStages _parserStages;
+
         public FromFileTransmitterProgram(IParserProgramStages parserStages)  : base()
 		{
             _parserStages = parserStages;
