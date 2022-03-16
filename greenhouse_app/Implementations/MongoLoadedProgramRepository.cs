@@ -7,11 +7,11 @@ using System.Configuration;
 
 namespace greenhouse_app.Implementations
 {
-    public class MongoLoadedProgramRepository : IRepository<LoadedProgram>
+    public class MongoLoadedProgramRepository : IRepository<LoadedProgramBase>
     {
         private readonly MongoClient client;
         private readonly IMongoDatabase database;
-        private readonly IMongoCollection<BsonDocument> collection;
+        private readonly IMongoCollection<LoadedProgramBase> collection;
         private readonly string _connectionString;
 
         public MongoLoadedProgramRepository(string connectionString)
@@ -20,20 +20,11 @@ namespace greenhouse_app.Implementations
 
             client = new MongoClient(connectionString);
             database = client.GetDatabase(connection.DatabaseName);
-            collection = database.GetCollection<BsonDocument>("LoadedProgram");
+            collection = database.GetCollection<LoadedProgramBase>("LoadedProgram");
         }
 
-        public IMongoCollection<LoadedProgram> LoadedPrograms
-        {
-            get
-            {
-                return database.GetCollection<LoadedProgram>("LoadedProgram");
-            }
-        }
-
-        public async Task<List<BsonDocument>> GetLoadedProgramListAsync()
-        {
-            
+        public async Task<List<LoadedProgramBase>> GetLoadedProgramListAsync()
+        {          
             var filter = new BsonDocument();
             var loadedPrograms = await collection.Find(filter).ToListAsync();
             return loadedPrograms;
@@ -43,22 +34,17 @@ namespace greenhouse_app.Implementations
 
         public void Dispose() { }
 
-        public IEnumerable<LoadedProgram> GetLoadedProgramList()
+        public LoadedProgramBase GetLoadedProgram(int id)
         {
             throw new NotImplementedException();
         }
 
-        public LoadedProgram GetLoadedProgram(int id)
+        public void Create(LoadedProgramBase item)
         {
-            throw new NotImplementedException();
+            collection.InsertOneAsync(item);
         }
 
-        public void Create(LoadedProgram item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Update(LoadedProgram item)
+        public void Update(LoadedProgramBase item)
         {
             throw new NotImplementedException();
         }
