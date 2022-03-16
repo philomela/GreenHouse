@@ -1,10 +1,10 @@
 namespace greenhouse_app.Interfaces;
 
-abstract public class ChannelBase<T>
+abstract public class ChannelBase
 {   
     protected ICommunicator _communicator;
 
-    protected abstract Queue<T> Messages { get; set; }
+    //protected abstract event Func<string, string> ResultCommand
 
     public ChannelBase(ICommunicator communicator) 
     {

@@ -5,6 +5,7 @@ using greenhouse_app.Data.Models;
 using greenhouse_app.Extensions;
 using greenhouse_app.Implementations;
 using greenhouse_app.Interfaces;
+using MediatR;
 using Newtonsoft.Json;
 
 namespace greenhouse_app.ProgramLogic
@@ -15,35 +16,46 @@ namespace greenhouse_app.ProgramLogic
     public class Dispatcher  
     {
         private readonly IRepository<LoadedProgramBase> _mongoRepository;
+        private readonly IMediator _mediator;
         private readonly ArduinoChannel _arduino;
         private readonly RaspberryChannel _raspberry;
 
         public Dispatcher()
         {}
 
-        public Dispatcher(IRepository<LoadedProgramBase> mongoRepository, ArduinoChannel arduino, RaspberryChannel raspberry) =>
-            (_mongoRepository, _arduino, _raspberry) = (mongoRepository, arduino, raspberry);
+        public Dispatcher(IRepository<LoadedProgramBase> mongoRepository, IMediator mediator) =>
+            (_mongoRepository, _mediator) = (mongoRepository, mediator);
 
         public async Task RunProgram(SerialPort serialPort)
         {
-            var currentDay = GetCurrentDayInProgram();
-
-            _raspberry.SendCommand($"ProgramDay={JsonConvert.SerializeObject(currentDay)}");
-
-            serialPort.ListenArduinoAsync(_arduino);
-
-            while(true)
-            {
-                serialPort
-            }
-
-
+            await RunArduino(serialPort);
+            await RunRaspberry();
         }
 
-        private async Task<LoadedProgramDay> GetCurrentDayInProgram()
-        {
-            var currentDate = DateTime.Now.Date;
+        private async Task RunArduino(SerialPort serialPort) => await serialPort.ArduinoChannelWorkAsync(_mediator);
 
+        private async Task RunRaspberry()
+        {
+            await Task.Run(() =>
+            {
+                var currentDate = DateTime.Now.Date;
+
+                while (true)
+                {
+                    if (currentDate != DateTime.Now.Date)
+                    {
+                        currentDate = DateTime.Now.Date;
+
+                        var currentDay = GetCurrentDayInProgram(currentDate);
+
+                        //_raspberry.SendCommand($"ProgramDay={JsonConvert.SerializeObject(currentDay)}");
+                    }
+                }
+            });          
+        }
+
+        private async Task<LoadedProgramDay> GetCurrentDayInProgram(DateTime currentDate)
+        {
             var programs = await _mongoRepository.GetLoadedProgramListAsync();
 
             var currentProgram = programs.Last();
@@ -60,17 +72,6 @@ namespace greenhouse_app.ProgramLogic
             }
 
             throw new Exception("Didn't difine day");
-        }
-
-        private async Task GetParametersDay(LoadedProgramDay currentDay) {
-            
-        }
-
-
-        public async Task ShowProgramMongoAsync()
-        {
-            var listProgram = await _mongoRepository.GetLoadedProgramListAsync();
-            listProgram.ForEach(x => Console.WriteLine(x));
         }
     }
 }

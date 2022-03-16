@@ -9,6 +9,7 @@ using MongoDB.Driver;
 using System.Linq;
 using greenhouse_app.Extensions;
 using greenhouse_app.Data.Models;
+using MediatR;
 
 var builder = new ConfigurationBuilder();
 
@@ -23,42 +24,34 @@ string connectionString = config.GetConnectionString("Mongo");
 var serviceCollection = new ServiceCollection();
 serviceCollection.AddTransient<IParserProgramStages, ParserProgramStages>();
 serviceCollection.AddTransient<IRepository<LoadedProgramBase>, MongoLoadedProgramRepository>(x => new MongoLoadedProgramRepository(connectionString));
+
 serviceCollection.AddSingleton<ArduinoChannel>();
 serviceCollection.AddSingleton<RaspberryChannel>();
-serviceCollection.AddSingleton<ICommunicator, CommunicatorDevices>();
+//serviceCollection.AddSingleton<ICommunicator, CommunicatorDevices>();
+
+serviceCollection.AddMediatR(typeof(Program));
+
 serviceCollection.AddTransient<Dispatcher>();
 var serviceProvider = serviceCollection.BuildServiceProvider();
 
 Console.WriteLine("Control application started");
 
+
+//var mediator = new CommunicatorDevices();
+//var ard = new ArduinoChannel(mediator);
+//var ras = new RaspberryChannel(mediator);
+//mediator._arduinoChannel = ard;
+//mediator._raspberryChannel = ras;
+
 var programFromFile = await new InDbTransmitterProgram<string, LoadedProgramBase>(
     new FromFileTransmitterProgram<string, LoadedProgramBase>(serviceProvider.GetService<IParserProgramStages>()),
     serviceProvider.GetService<IRepository<LoadedProgramBase>>()).TransmitProgram("ProgramExample.json");
 
-//var mediator = new CommunicatorDevices();
-//var arduino = new ArduinoChannel(mediator);
-//var raspberry = new RaspberryChannel(mediator);
-//mediator._arduinoChannel = arduino;
-//mediator._raspberryChannel = raspberry;
-
-//arduino.SendCommand("Hello I'am arduino uno!");
-
-//raspberry.SendCommand("Hello I'm raspberry!");
-
-
-//var dispatcher = serviceProvider.GetService<Dispatcher>();
-
 var portDetected = await Configure();
 
-//portDetected.ListenArduinoAsync(arduino);
+await serviceProvider.GetService<Dispatcher>().RunProgram(portDetected);
 
-var dispatcher = new Dispatcher(); //todo: Убрать констр по умолчанию и зарегистрировать красиво эту зависимоть
-
-
-
-
-//dispatcher.ShowProgramMongoAsync();
-
+Console.WriteLine("Channels started");
 Console.ReadLine();
 
 static async Task<SerialPort> Configure()
