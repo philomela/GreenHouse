@@ -8,6 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using System.Linq;
 using greenhouse_app.Extensions;
+using greenhouse_app.Data.Models;
+using MediatR;
 
 var builder = new ConfigurationBuilder();
 
@@ -20,29 +22,43 @@ var config = builder.Build();
 string connectionString = config.GetConnectionString("Mongo");
 
 var serviceCollection = new ServiceCollection();
-serviceCollection.AddTransient<IAuditorable, AuditorGreenHouse>();
-serviceCollection.AddTransient<IControlable, ControllerGreenHouse>();
-serviceCollection.AddTransient<MongoLoadedProgramRepository>(x => new MongoLoadedProgramRepository(connectionString));
+serviceCollection.AddTransient<IParserProgramStages, ParserProgramStages>();
+serviceCollection.AddTransient<IRepository<LoadedProgramBase>, MongoLoadedProgramRepository>(x => new MongoLoadedProgramRepository(connectionString));
+
+serviceCollection.AddSingleton<ArduinoChannel>();
+serviceCollection.AddSingleton<RaspberryChannel>();
+//serviceCollection.AddSingleton<ICommunicator, CommunicatorDevices>();
+
+serviceCollection.AddMediatR(typeof(Program));
+
 serviceCollection.AddTransient<Dispatcher>();
 var serviceProvider = serviceCollection.BuildServiceProvider();
 
 Console.WriteLine("Control application started");
 
-var dispatcher = serviceProvider.GetService<Dispatcher>();
+
+//var mediator = new CommunicatorDevices();
+//var ard = new ArduinoChannel(mediator);
+//var ras = new RaspberryChannel(mediator);
+//mediator._arduinoChannel = ard;
+//mediator._raspberryChannel = ras;
+
+var programFromFile = await new InDbTransmitterProgram<string, LoadedProgramBase>(
+    new FromFileTransmitterProgram<string, LoadedProgramBase>(serviceProvider.GetService<IParserProgramStages>()),
+    serviceProvider.GetService<IRepository<LoadedProgramBase>>()).TransmitProgram("ProgramExample.json");
 
 var portDetected = await Configure();
 
-Console.WriteLine($"{portDetected}");
+await serviceProvider.GetService<Dispatcher>().RunProgram(portDetected);
 
-dispatcher.ShowProgramMongoAsync();
-
+Console.WriteLine("Channels started");
 Console.ReadLine();
 
-static async Task<string> Configure()
+static async Task<SerialPort> Configure()
 {
     var serialPorts = SerialPort.GetPortNames();
 
-    var taskSlice = new List<Task<string>>();
+    var taskSlice = new List<Task<SerialPort>>();
 
     var cts = new CancellationTokenSource();
     var token = cts.Token;
@@ -58,18 +74,18 @@ static async Task<string> Configure()
                 }));
     }
 
-    string portDetected = await Task.Run(() =>
+    var portDetected = await Task.Run(() =>
     {
-        string portDetected = null;
+        SerialPort portDetected = null;
         while (true)
         {
             portDetected = taskSlice.Where(
                 x => x is not null
                 && x.IsCompletedSuccessfully == true)?.FirstOrDefault()?.Result;
 
-            if (!string.IsNullOrEmpty(portDetected))
+            if (portDetected is not null)
             {
-               return portDetected;
+                return portDetected;
             }
         }
     });
@@ -78,10 +94,9 @@ static async Task<string> Configure()
     return portDetected;
 }
 
-static async Task<string> PingPort(SerialPort serialPort, CancellationToken token, int baudRate = 9600)
+static async Task<SerialPort> PingPort(SerialPort serialPort, CancellationToken token, int baudRate = 9600)
 {
     var msgPing = string.Empty;
-    //var serialPort = new SerialPort(namePort);
 
     serialPort.BaudRate = baudRate;
     serialPort.Open();
@@ -89,8 +104,8 @@ static async Task<string> PingPort(SerialPort serialPort, CancellationToken toke
     while (msgPing != "PingMsg\r")
     {
         if (token.IsCancellationRequested)
-            return null;
-        msgPing = serialPort.ReadLine();     
+            return serialPort;
+        msgPing = serialPort.ReadLine();
     }
 
     Console.WriteLine($"Port arduino detected: {serialPort.PortName}");
@@ -98,5 +113,5 @@ static async Task<string> PingPort(SerialPort serialPort, CancellationToken toke
     serialPort.Write(new byte[] { 1 }, 0, 1);
     Console.WriteLine("Arduino ready");
 
-    return serialPort.PortName;
+    return serialPort;
 }

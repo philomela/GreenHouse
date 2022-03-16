@@ -4,19 +4,16 @@ lampPinThree = 4,
 waterPin = A1, 
 tempPin = A3;
 
-int i = 0;
 void setup() {
-  
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(lampPinOne, OUTPUT);
   pinMode(lampPinTwo, OUTPUT);
   pinMode(lampPinThree, OUTPUT);
   Serial.begin(9600);
-  connectComputer();
+  СonnectComputer();
 }
 
 void loop() {
-  
   digitalWrite(LED_BUILTIN, HIGH);
   digitalWrite(lampPinOne, LOW);
   digitalWrite(lampPinTwo, LOW);
@@ -26,10 +23,6 @@ void loop() {
   int valTempSensor = analogRead(tempPin);
   Serial.println(valWaterSensor);
   Serial.println(valTempSensor);
-  if (i == 5) {
-    i = 0;   
-  }
-  i++;
   Serial.println(i);
   digitalWrite(LED_BUILTIN, LOW);
   digitalWrite(lampPinOne, HIGH);
@@ -38,10 +31,24 @@ void loop() {
   delay(5000);
 }
 
-void connectComputer() {
+void GetProgramOnDay() {
+  
+}
+
+void СonnectComputer() {
   volatile int msgIndicator = -1;
   while (msgIndicator == -1) {
     Serial.println("PingMsg");
     msgIndicator = Serial.read();
   }
+}
+
+void CorrectTemperature() {
+}
+
+void CorrectLigth() {
+}
+
+void CorrectWater() {
+}
 }

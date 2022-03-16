@@ -4,7 +4,7 @@ namespace greenhouse_app.Interfaces
     public interface IRepository<T> : IDisposable
     where T : class
     {
-        IEnumerable<T> GetLoadedProgramList(); // получение всех объектов
+        Task<List<T>> GetLoadedProgramListAsync(); // получение всех объектов
         T GetLoadedProgram(int id); // получение одного объекта по id
         void Create(T item); // создание объекта
         void Update(T item); // обновление объекта
