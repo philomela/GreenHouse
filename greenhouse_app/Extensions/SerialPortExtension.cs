@@ -10,7 +10,9 @@ namespace greenhouse_app.Extensions
     {
         public static async Task ArduinoChannelWorkAsync(this SerialPort serialPort, IMediator mediator)
         {
-            //serialPort.Open();
+            if (!serialPort.IsOpen) {
+                serialPort.Open();
+            }
 
             await Task.Run(() =>
             {

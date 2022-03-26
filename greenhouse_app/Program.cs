@@ -29,6 +29,8 @@ serviceCollection.AddMediatR(typeof(Program));
  
 serviceCollection.AddSingleton<TransmitterProgramBase<string, LoadedProgramBase>, FromFileTransmitterProgram<string, LoadedProgramBase>>();
 serviceCollection.AddSingleton<TransmitterProgramDecorator<string, LoadedProgramBase>, InDbTransmitterProgram<string, LoadedProgramBase>>();
+serviceCollection.AddSingleton<IArduinoManager<SerialPort>, ArduinoManager>();
+serviceCollection.AddSingleton<IRaspberryManager, RaspberryManager>();
 
 serviceCollection.AddTransient<Dispatcher>();
 var serviceProvider = serviceCollection.BuildServiceProvider();
@@ -37,8 +39,6 @@ Console.WriteLine("Control application started");
 
 var service = serviceProvider.GetRequiredService<TransmitterProgramDecorator<string, LoadedProgramBase>>();
 service.TransmitProgram("ProgramExample.json");
-
-await serviceProvider.GetService<Dispatcher>().RunProgram(null);
 
 var portDetected = await Configure();
 
