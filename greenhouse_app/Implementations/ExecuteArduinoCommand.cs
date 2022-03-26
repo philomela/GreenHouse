@@ -5,7 +5,7 @@ namespace greenhouse_app.Implementations
 {
 	public class ExecuteArduinoCommand : IRequest<string>
 	{
-		public ExecuteArduinoCommand(string message) => message = Message; 
+		public ExecuteArduinoCommand(string message) => Message = message; 
 
         public string Message { get; set; }
     }

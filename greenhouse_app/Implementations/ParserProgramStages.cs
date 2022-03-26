@@ -21,7 +21,7 @@ namespace greenhouse_app.Implementations
                     Date = lastDate
                 }); ;
 
-                for (int i = 0; i <= currStage.Days; i++)
+                for (int i = 0; i < currStage.Days; i++)
                 {
                     currStage.DaysCollection.Add(currStage.DaysCollection.LastOrDefault().Clone() as LoadedProgramDay);
                     if (i == currStage.Days - 1)

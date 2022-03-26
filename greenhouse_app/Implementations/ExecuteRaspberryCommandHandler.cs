@@ -13,7 +13,7 @@ namespace greenhouse_app.Implementations
         {
             await Task.Run(() =>
             {
-                Console.WriteLine("Raspberry get work");
+                Console.WriteLine(request.Message);
             });
 
             return null;

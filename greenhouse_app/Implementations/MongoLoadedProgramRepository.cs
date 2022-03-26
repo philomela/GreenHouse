@@ -13,21 +13,28 @@ namespace greenhouse_app.Implementations
         private readonly IMongoDatabase database;
         private readonly IMongoCollection<LoadedProgramBase> collection;
         private readonly string _connectionString;
+        private readonly MongoUrlBuilder _connection;
 
         public MongoLoadedProgramRepository(string connectionString)
         {
-            var connection = new MongoUrlBuilder(connectionString);
-
+            _connection = new MongoUrlBuilder(connectionString);
             client = new MongoClient(connectionString);
-            database = client.GetDatabase(connection.DatabaseName);
+            database = client.GetDatabase(_connection.DatabaseName);
             collection = database.GetCollection<LoadedProgramBase>("LoadedProgram");
         }
 
         public async Task<List<LoadedProgramBase>> GetLoadedProgramListAsync()
-        {          
-            var filter = new BsonDocument();
-            var loadedPrograms = await collection.Find(filter).ToListAsync();
-            return loadedPrograms;
+        {
+            try {
+                var filter = new BsonDocument();
+                var loadedPrograms = await collection.Find(filter).ToListAsync();
+                return loadedPrograms;
+            }
+            catch(Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+            
         }
 
         public void Save() { }

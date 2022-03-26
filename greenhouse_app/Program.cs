@@ -10,6 +10,7 @@ using System.Linq;
 using greenhouse_app.Extensions;
 using greenhouse_app.Data.Models;
 using MediatR;
+using Newtonsoft.Json;
 
 var builder = new ConfigurationBuilder();
 
@@ -24,28 +25,20 @@ string connectionString = config.GetConnectionString("Mongo");
 var serviceCollection = new ServiceCollection();
 serviceCollection.AddTransient<IParserProgramStages, ParserProgramStages>();
 serviceCollection.AddTransient<IRepository<LoadedProgramBase>, MongoLoadedProgramRepository>(x => new MongoLoadedProgramRepository(connectionString));
-
-serviceCollection.AddSingleton<ArduinoChannel>();
-serviceCollection.AddSingleton<RaspberryChannel>();
-//serviceCollection.AddSingleton<ICommunicator, CommunicatorDevices>();
-
 serviceCollection.AddMediatR(typeof(Program));
+ 
+serviceCollection.AddSingleton<TransmitterProgramBase<string, LoadedProgramBase>, FromFileTransmitterProgram<string, LoadedProgramBase>>();
+serviceCollection.AddSingleton<TransmitterProgramDecorator<string, LoadedProgramBase>, InDbTransmitterProgram<string, LoadedProgramBase>>();
 
 serviceCollection.AddTransient<Dispatcher>();
 var serviceProvider = serviceCollection.BuildServiceProvider();
 
 Console.WriteLine("Control application started");
 
+var service = serviceProvider.GetRequiredService<TransmitterProgramDecorator<string, LoadedProgramBase>>();
+service.TransmitProgram("ProgramExample.json");
 
-//var mediator = new CommunicatorDevices();
-//var ard = new ArduinoChannel(mediator);
-//var ras = new RaspberryChannel(mediator);
-//mediator._arduinoChannel = ard;
-//mediator._raspberryChannel = ras;
-
-var programFromFile = await new InDbTransmitterProgram<string, LoadedProgramBase>(
-    new FromFileTransmitterProgram<string, LoadedProgramBase>(serviceProvider.GetService<IParserProgramStages>()),
-    serviceProvider.GetService<IRepository<LoadedProgramBase>>()).TransmitProgram("ProgramExample.json");
+await serviceProvider.GetService<Dispatcher>().RunProgram(null);
 
 var portDetected = await Configure();
 
