@@ -23,7 +23,7 @@ namespace greenhouse_app.ProgramLogic
 
         public async Task RunProgram(SerialPort serialPort)
         {
-            await _raspberryManager.RunRaspberryAsync();
+            await _raspberryManager.RunRaspberryAsync(serialPort);
             await _arduinoManager.RunArduinoAsync(serialPort);
         }
     }

@@ -13,7 +13,7 @@ namespace greenhouse_app.Implementations
         {
             await Task.Run(() =>
             {
-                Console.WriteLine(request.Message);
+                request.SerialPortArduino.WriteLine(request.Message);
             });
 
             return null;

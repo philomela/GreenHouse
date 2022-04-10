@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO.Ports;
 using greenhouse_app.Data.Models;
 using greenhouse_app.Interfaces;
 using MediatR;
@@ -14,7 +15,7 @@ namespace greenhouse_app.Implementations
         public RaspberryManager(IMediator mediator, IRepository<LoadedProgramBase> mongoRepository) =>
             (_mediator, _mongoRepository) = (mediator, mongoRepository);
 
-        async Task IRaspberryManager.RunRaspberryAsync()
+        public async Task RunRaspberryAsync(SerialPort serialPort)
         {
             var currentDate = DateTime.Now.Date;
 
@@ -26,7 +27,7 @@ namespace greenhouse_app.Implementations
                     ReferenceLoopHandling = ReferenceLoopHandling.Serialize
                 });
 
-            _mediator.Send(new ExecuteArduinoCommand($"ProgramDay={dayJson}"));
+            var result = _mediator.Send(new ExecuteArduinoCommand($"ProgramDay={dayJson}", serialPort));
 
             await Task.Run(() =>
             {
